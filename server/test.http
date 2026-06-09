@@ -1,0 +1,68 @@
+@baseUrl = http://localhost:5000
+
+###
+# REGISTER USER
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Arushi",
+  "email": "arushi@gmail.com",
+  "password": "123456"
+}
+
+###
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Aditya",
+  "email": "adi@gmail.com",
+  "password": "123456"
+}
+
+###
+# LOGIN USER
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "arushi@gmail.com",
+  "password": "123456"
+}
+
+###
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adi@gmail.com",
+  "password": "123456"
+}
+
+###
+POST http://localhost:5000/api/projects
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZhOTZhN2Y3OGM3YTc1MDRmMjE4NSIsImlhdCI6MTc3OTk4MDM0NCwiZXhwIjoxNzgwNTg1MTQ0fQ.D5PXbos11it6By7IH8cH99dz7fBhr6U9bH0qV8A16VQ
+
+{
+  "title": "MovieFlix",
+  "description": "Movie project"
+}
+
+###
+GET http://localhost:5000/api/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZhOTZhN2Y3OGM3YTc1MDRmMjE4NSIsImlhdCI6MTc3OTk4MDM0NCwiZXhwIjoxNzgwNTg1MTQ0fQ.D5PXbos11it6By7IH8cH99dz7fBhr6U9bH0qV8A16VQ
+
+###
+DELETE http://localhost:5000/api/projects/6a18584df83e1cc4b9a79747
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZhOTZhN2Y3OGM3YTc1MDRmMjE4NSIsImlhdCI6MTc3OTk4MDM0NCwiZXhwIjoxNzgwNTg1MTQ0fQ.D5PXbos11it6By7IH8cH99dz7fBhr6U9bH0qV8A16VQ
+
+###
+PUT http://localhost:5000/api/projects/6a185eb59cc086de071d9869/add-member
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTZhOTZhN2Y3OGM3YTc1MDRmMjE4NSIsImlhdCI6MTc3OTk4MDM0NCwiZXhwIjoxNzgwNTg1MTQ0fQ.D5PXbos11it6By7IH8cH99dz7fBhr6U9bH0qV8A16VQ
+
+{
+  "email": "adi@gmail.com"
+}
