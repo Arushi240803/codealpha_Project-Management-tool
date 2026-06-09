@@ -69,7 +69,7 @@ A full-stack collaborative project management application inspired by Trello and
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/your-username/project-management-tool.git
+git clone https://github.com/Arushi240803/Project-Management-tool.git
 ```
 
 ---
