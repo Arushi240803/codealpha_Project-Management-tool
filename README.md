@@ -1,141 +1,76 @@
-# Project Management Tool
+Project Management Tool
 
 A full-stack collaborative project management application inspired by Trello and Asana.
 
----
+Features
+Authentication
+User Registration
+User Login
+JWT Token Authentication
+Protected Dashboard
+Dashboard
+Professional SaaS-style UI
+Project Cards
+Responsive Layout
+Project Management
+Create New Projects
+Shared Workspace
+Task Assignment
+Comments System
+Kanban-style Workflow
 
-##  Features
+Users Can
+Register & Login
+Create Projects
+View Shared Project Boards
+Manage Tasks
+Add Comments
+Collaborate in a Kanban-style Workspace
 
-###  Authentication
+Tech Stack
+Frontend
+HTML5
+Tailwind CSS
+JavaScript
 
-* User Registration
-* User Login
-* JWT Token Authentication
-* Protected Dashboard
+Backend
+Node.js
+Express.js
 
-###  Dashboard
+Database
+MongoDB
+Authentication
+JWT (JSON Web Token)
+bcrypt.js
 
-* Professional SaaS-style UI
-* Project Cards
-* Responsive Layout
+Deployment
+Live Frontend (Vercel)
 
-### 📁 Project Management
+The frontend is deployed on Vercel:
+👉 https://codealpha-project-management-tool-phi.vercel.app/
 
-* Create New Projects
-* Shared Workspace
-* Task Assignment
-* Comments System
-* Kanban-style Workflow
 
----
+Backend API (Render)
 
-## 👥 Users Can
+The backend is deployed on Render (Node.js + Express API).
 
-* Register & Login
-* Create Projects
-* View Shared Project Boards
-* Manage Tasks
-* Add Comments
-* Collaborate in a Kanban-style Workspace
+Database (MongoDB Atlas)
 
----
+The database is hosted on MongoDB Atlas.
 
-## 🛠️ Tech Stack
 
-### Frontend
 
-* HTML5
-* Tailwind CSS
-* JavaScript
+Architecture Overview
+Frontend (Vercel) → calls → Backend API (Render)
+Backend → connects → MongoDB Atlas
+Authentication handled via JWT
 
-### Backend
+Future Improvements
+Drag & Drop Kanban Board
+Real-time Updates using Socket.IO
+Notifications System
+File Upload Support
+Task Deadlines
+Author
 
-* Node.js
-* Express.js
-
-### Database
-
-* MongoDB
-
-### Authentication
-
-* JWT (JSON Web Token)
-* bcrypt.js
-
----
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone Repository
-
-```bash
-git clone https://github.com/Arushi240803/Project-Management-tool.git
-```
-
----
-
-##  Backend Setup
-
-Go to backend folder:
-
-```bash
-cd backend
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run backend server:
-
-```bash
-npm run dev
-```
-
-Server runs on:
-
-```bash
-http://localhost:5000
-```
-
----
-
-## Frontend Setup
-
-Open a new terminal.
-
-Go to frontend folder:
-
-```bash
-cd frontend
-```
-
-Run frontend:
-
-```bash
-npm run dev
-```
-
----
-
-##  Database Setup
-
-Make sure MongoDB is running locally on your system.
-
----
-
-## 📌 Future Improvements
-
-* Drag & Drop Kanban Board
-* Real-time Updates using Socket.IO
-* Notifications System
-* File Upload Support
-* Task Deadlines
-
----
-
-## 👩‍💻 Author
-
-**Arushi Naskar**
+Arushi Naskar
