@@ -1,10 +1,7 @@
 import { useState } from "react"
-
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 import { loginUser } from "../services/authService"
-
-
 
 function Login() {
   const navigate = useNavigate()
@@ -43,8 +40,10 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 px-4">
+      
       {/* CARD */}
       <div className="w-full max-w-md bg-white/20 backdrop-blur-lg border border-white/30 shadow-2xl rounded-3xl p-8">
+        
         {/* HEADING */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold text-white mb-2">
@@ -52,8 +51,7 @@ function Login() {
           </h1>
 
           <p className="text-white/80">
-            Login to continue your
-            workspace
+            Login to continue your workspace
           </p>
         </div>
 
@@ -62,6 +60,7 @@ function Login() {
           onSubmit={handleSubmit}
           className="space-y-5"
         >
+          
           {/* EMAIL */}
           <div>
             <label className="block text-white mb-2 font-medium">
@@ -89,9 +88,7 @@ function Login() {
               type="password"
               name="password"
               placeholder="Enter your password"
-              value={
-                formData.password
-              }
+              value={formData.password}
               onChange={handleChange}
               className="w-full p-3 rounded-2xl bg-white/80 outline-none focus:ring-4 focus:ring-purple-300 transition"
               required
@@ -99,16 +96,31 @@ function Login() {
           </div>
 
           {/* BUTTON */}
-          <button className="w-full bg-white text-purple-700 font-bold py-3 rounded-2xl hover:scale-105 hover:bg-purple-100 transition duration-300 shadow-lg">
+          <button
+            type="submit"
+            className="w-full bg-white text-purple-700 font-bold py-3 rounded-2xl hover:scale-105 hover:bg-purple-100 transition duration-300 shadow-lg"
+          >
             Login
           </button>
         </form>
 
         {/* FOOTER */}
-        <p className="text-center text-white/80 mt-6">
-          Manage your projects
-          efficiently 🚀
-        </p>
+        <div className="text-center text-white/80 mt-6 space-y-2">
+          <p>
+            Manage your projects efficiently 🚀
+          </p>
+
+          <p>
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-white font-semibold hover:underline"
+            >
+              Register
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   )

@@ -10,17 +10,7 @@ function Sidebar() {
           Dashboard
         </div>
 
-        <div className="bg-gray-800 p-3 rounded-xl cursor-pointer hover:bg-gray-700 transition">
-          Projects
-        </div>
-
-        <div className="bg-gray-800 p-3 rounded-xl cursor-pointer hover:bg-gray-700 transition">
-          Tasks
-        </div>
-
-        <div className="bg-gray-800 p-3 rounded-xl cursor-pointer hover:bg-gray-700 transition">
-          Team
-        </div>
+        
       </div>
     </div>
   )
