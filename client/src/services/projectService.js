@@ -1,7 +1,11 @@
 import axios from "axios"
 
+
 const API_URL =
   `${import.meta.env.VITE_API_URL}/projects`
+
+const API_URL = `${import.meta.env.VITE_API_URL}/api/projects`
+
 
 const getToken = () => {
   return localStorage.getItem("token")
@@ -48,10 +52,7 @@ export const deleteProject = async (id) => {
 }
 
 // ADD MEMBER
-export const addMember = async (
-  projectId,
-  email
-) => {
+export const addMember = async (projectId, email) => {
   const response = await axios.put(
     `${API_URL}/${projectId}/add-member`,
     { email },

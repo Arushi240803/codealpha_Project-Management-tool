@@ -1,32 +1,28 @@
 import axios from "axios"
 
-const API_URL =
-  `${import.meta.env.VITE_API_URL}/comments`
+const API_URL = `${import.meta.env.VITE_API_URL}/api/comments`
 
 const getToken = () => {
   return localStorage.getItem("token")
 }
 
 // CREATE COMMENT
-export const createComment =
-  async (commentData) => {
-    const response = await axios.post(
-      API_URL,
-      commentData,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    )
+export const createComment = async (commentData) => {
+  const response = await axios.post(
+    API_URL,
+    commentData,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  )
 
-    return response.data
-  }
+  return response.data
+}
 
 // GET COMMENTS
-export const getComments = async (
-  taskId
-) => {
+export const getComments = async (taskId) => {
   const response = await axios.get(
     `${API_URL}/${taskId}`,
     {
@@ -40,17 +36,15 @@ export const getComments = async (
 }
 
 // DELETE COMMENT
-export const deleteComment =
-  async (commentId) => {
-    const response =
-      await axios.delete(
-        `${API_URL}/${commentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      )
+export const deleteComment = async (commentId) => {
+  const response = await axios.delete(
+    `${API_URL}/${commentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  )
 
-    return response.data
-  }
+  return response.data
+}

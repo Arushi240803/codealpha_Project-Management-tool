@@ -1,16 +1,18 @@
 import axios from "axios"
 
+
 const API_URL =
   `${import.meta.env.VITE_API_URL}/tasks`
+
+const API_URL = `${import.meta.env.VITE_API_URL}/api/tasks`
+
 
 const getToken = () => {
   return localStorage.getItem("token")
 }
 
 // CREATE TASK
-export const createTask = async (
-  taskData
-) => {
+export const createTask = async (taskData) => {
   const response = await axios.post(
     API_URL,
     taskData,
@@ -25,9 +27,7 @@ export const createTask = async (
 }
 
 // GET TASKS
-export const getTasks = async (
-  projectId
-) => {
+export const getTasks = async (projectId) => {
   const response = await axios.get(
     `${API_URL}/${projectId}`,
     {
@@ -41,25 +41,22 @@ export const getTasks = async (
 }
 
 // UPDATE TASK STATUS
-export const updateTaskStatus =
-  async (taskId, status) => {
-    const response = await axios.put(
-      `${API_URL}/${taskId}`,
-      { status },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    )
+export const updateTaskStatus = async (taskId, status) => {
+  const response = await axios.put(
+    `${API_URL}/${taskId}`,
+    { status },
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  )
 
-    return response.data
-  }
+  return response.data
+}
 
 // DELETE TASK
-export const deleteTask = async (
-  taskId
-) => {
+export const deleteTask = async (taskId) => {
   const response = await axios.delete(
     `${API_URL}/${taskId}`,
     {
