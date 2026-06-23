@@ -476,22 +476,25 @@ function Dashboard() {
                       className="w-full border p-4 rounded-xl"
                     />
 
-                    <input
-                      type="text"
-                      placeholder="Assign To"
-                      value={
-                        taskInputs[project._id]?.assignedTo || ""
-                      }
-                      onChange={(e) =>
-                        handleTaskInputChange(
-                          project._id,
-                          "assignedTo",
-                          e.target.value
-                        )
-                      }
-                      className="w-full border p-4 rounded-xl"
-                    />
+                    <select
+  value={taskInputs[project._id]?.assignedTo || ""}
+  onChange={(e) =>
+    handleTaskInputChange(
+      project._id,
+      "assignedTo",
+      e.target.value
+    )
+  }
+  className="w-full border p-4 rounded-xl"
+>
+  <option value="">Assign To</option>
 
+  {project.members?.map((member) => (
+    <option key={member._id} value={member._id}>
+      {member.name}
+    </option>
+  ))}
+</select>
                     <button
                       onClick={() =>
                         handleCreateTask(project._id)

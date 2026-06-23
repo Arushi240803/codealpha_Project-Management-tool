@@ -23,13 +23,19 @@ const createTask = async (req, res) => {
     }
 
     // CHECK USER IS PROJECT MEMBER
-    if (
-      !project.members.includes(req.user)
-    ) {
-      return res.status(401).json({
-        message: "Not authorized",
-      })
-    }
+    const isOwner =
+  project.owner.toString() === req.user._id.toString()
+
+const isMember = project.members.some(
+  (member) =>
+    member.toString() === req.user._id.toString()
+)
+
+if (!isOwner && !isMember) {
+  return res.status(401).json({
+    message: "Not authorized",
+  })
+}
 
     // CREATE TASK
     const task = await Task.create({
