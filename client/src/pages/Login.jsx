@@ -22,7 +22,19 @@ function Login() {
 
     try {
       const data = await loginUser(formData);
+
+      console.log("Login Response:", data);
+
       localStorage.setItem("token", data.token);
+
+      // Store user if backend returns user object
+      if (data.user) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+      }
+
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
@@ -32,7 +44,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex bg-slate-100">
-      
       {/* LEFT SECTION */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-12 flex-col justify-between">
         <div>
@@ -73,7 +84,6 @@ function Login() {
       {/* RIGHT SECTION */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
-          
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-slate-800">
               Welcome Back
@@ -84,7 +94,6 @@ function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            
             <div>
               <label className="block text-slate-700 font-medium mb-2">
                 Email
