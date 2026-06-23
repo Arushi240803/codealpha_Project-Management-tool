@@ -15,7 +15,15 @@ const createProject = async (req, res) => {
       members: [req.user],
     })
 
-    res.status(201).json(project)
+    const populatedProject = await Project.findById(project._id)
+      .populate("members", "name email")
+      .populate("owner", "name email")
+
+    // SOCKET EMIT
+    const io = req.app.get("io")
+    io.emit("projectCreated", populatedProject)
+
+    res.status(201).json(populatedProject)
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -26,7 +34,6 @@ const createProject = async (req, res) => {
 // GET PROJECTS
 const getProjects = async (req, res) => {
   try {
-    // SHOW PROJECTS WHERE USER IS MEMBER
     const projects = await Project.find({
       members: req.user,
     })
@@ -55,7 +62,13 @@ const deleteProject = async (req, res) => {
       })
     }
 
+    const projectId = project._id
+
     await project.deleteOne()
+
+    // SOCKET EMIT
+    const io = req.app.get("io")
+    io.emit("projectDeleted", projectId)
 
     res.status(200).json({
       message: "Project deleted",
@@ -73,9 +86,7 @@ const addMember = async (req, res) => {
     const { email } = req.body
 
     // FIND USER
-    const user = await User.findOne({
-      email,
-    })
+    const user = await User.findOne({ email })
 
     if (!user) {
       return res.status(404).json({
@@ -84,9 +95,7 @@ const addMember = async (req, res) => {
     }
 
     // FIND PROJECT
-    const project = await Project.findById(
-      req.params.id
-    )
+    const project = await Project.findById(req.params.id)
 
     if (!project) {
       return res.status(404).json({
@@ -95,9 +104,7 @@ const addMember = async (req, res) => {
     }
 
     // CHECK DUPLICATE MEMBER
-    if (
-      project.members.includes(user._id)
-    ) {
+    if (project.members.includes(user._id)) {
       return res.status(400).json({
         message: "User already member",
       })
@@ -105,11 +112,19 @@ const addMember = async (req, res) => {
 
     // ADD MEMBER
     project.members.push(user._id)
-
     await project.save()
+
+    const updatedProject = await Project.findById(req.params.id)
+      .populate("members", "name email")
+      .populate("owner", "name email")
+
+    // SOCKET EMIT
+    const io = req.app.get("io")
+    io.emit("memberAdded", updatedProject)
 
     res.status(200).json({
       message: "Member added",
+      project: updatedProject,
     })
   } catch (error) {
     res.status(500).json({

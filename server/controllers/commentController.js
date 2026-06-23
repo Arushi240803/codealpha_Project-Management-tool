@@ -28,6 +28,12 @@ const createComment = async (
         user: req.user,
       })
 
+
+    const io = req.app.get("io")
+    io.emit("commentCreated", comment)
+
+    res.status(201).json(comment)
+
     // POPULATE USER NAME
     const populatedComment =
       await Comment.findById(

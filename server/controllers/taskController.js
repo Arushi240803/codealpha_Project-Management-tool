@@ -12,9 +12,7 @@ const createTask = async (req, res) => {
     } = req.body
 
     // CHECK PROJECT EXISTS
-    const project = await Project.findById(
-      projectId
-    )
+    const project = await Project.findById(projectId)
 
     if (!project) {
       return res.status(404).json({
@@ -22,20 +20,20 @@ const createTask = async (req, res) => {
       })
     }
 
-    // CHECK USER IS PROJECT MEMBER
+    // CHECK USER ACCESS
     const isOwner =
-  project.owner.toString() === req.user._id.toString()
+      project.owner.toString() === req.user._id.toString()
 
-const isMember = project.members.some(
-  (member) =>
-    member.toString() === req.user._id.toString()
-)
+    const isMember = project.members.some(
+      (member) =>
+        member.toString() === req.user._id.toString()
+    )
 
-if (!isOwner && !isMember) {
-  return res.status(401).json({
-    message: "Not authorized",
-  })
-}
+    if (!isOwner && !isMember) {
+      return res.status(401).json({
+        message: "Not authorized",
+      })
+    }
 
     // CREATE TASK
     const task = await Task.create({
@@ -44,6 +42,10 @@ if (!isOwner && !isMember) {
       project: projectId,
       assignedTo,
     })
+
+    // REALTIME EVENT
+    const io = req.app.get("io")
+    io.emit("taskCreated", task)
 
     res.status(201).json(task)
   } catch (error) {
@@ -69,17 +71,10 @@ const getTasks = async (req, res) => {
 }
 
 // UPDATE TASK STATUS
-const updateTaskStatus = async (
-  req,
-  res
-) => {
+const updateTaskStatus = async (req, res) => {
   try {
-    const task = await Task.findById(
-      req.params.id
-    ).populate(
-      "assignedTo",
-      "name email"
-    )
+    const task = await Task.findById(req.params.id)
+      .populate("assignedTo", "name email")
 
     if (!task) {
       return res.status(404).json({
@@ -88,8 +83,11 @@ const updateTaskStatus = async (
     }
 
     task.status = req.body.status
-
     await task.save()
+
+    // REALTIME EVENT
+    const io = req.app.get("io")
+    io.emit("taskUpdated", task)
 
     res.status(200).json(task)
   } catch (error) {
@@ -102,15 +100,19 @@ const updateTaskStatus = async (
 // DELETE TASK
 const deleteTask = async (req, res) => {
   try {
-    const task = await Task.findById(
-      req.params.id
-    )
+    const task = await Task.findById(req.params.id)
 
     if (!task) {
       return res.status(404).json({
         message: "Task not found",
       })
     }
+
+    // REALTIME EVENT
+    const io = req.app.get("io")
+    io.emit("taskDeleted", {
+      taskId: task._id,
+    })
 
     await task.deleteOne()
 

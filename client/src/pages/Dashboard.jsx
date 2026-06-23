@@ -90,17 +90,48 @@ function Dashboard() {
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
   fetchProjects()
 
   socket.on("connect", () => {
     console.log("Connected:", socket.id)
   })
 
+  socket.on("taskCreated", (task) => {
+    console.log("Task created:", task)
+    fetchProjects()
+  })
+
+  socket.on("taskUpdated", (task) => {
+    console.log("Task updated:", task)
+    fetchProjects()
+  })
+
+  socket.on("taskDeleted", (data) => {
+    console.log("Task deleted:", data)
+    fetchProjects()
+  })
+
+  socket.on("commentCreated", (comment) => {
+    console.log("Comment created:", comment)
+    fetchProjects()
+  })
+
+  socket.on("commentDeleted", (data) => {
+    console.log("Comment deleted:", data)
+    fetchProjects()
+  })
+
   return () => {
     socket.off("connect")
+    socket.off("taskCreated")
+    socket.off("taskUpdated")
+    socket.off("taskDeleted")
+    socket.off("commentCreated")
+    socket.off("commentDeleted")
   }
 }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
