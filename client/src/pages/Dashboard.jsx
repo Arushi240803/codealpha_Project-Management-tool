@@ -543,8 +543,8 @@ function Dashboard() {
                               </p>
 
                               <p className="text-sm text-gray-500 mt-3">
-                                Assigned to: {task.assignedTo}
-                              </p>
+                                   Assigned to: {task.assignedTo?.name || "Unassigned"}
+                               </p>
 
                               <select
                                 value={task.status}
