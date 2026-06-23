@@ -1,133 +1,149 @@
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-
-import { registerUser } from "../services/authService"
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { registerUser } from "../services/authService";
 
 function Register() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-  })
+  });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      await registerUser(formData)
-
-      alert("Registration successful")
-
-      navigate("/")
+      await registerUser(formData);
+      alert("Registration successful");
+      navigate("/");
     } catch (error) {
-      console.log(error)
-
-      alert("Registration failed")
+      console.log(error);
+      alert("Registration failed");
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 px-4">
+    <div className="min-h-screen flex bg-slate-100">
       
-      {/* REGISTER CARD */}
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl p-8 border border-white/40">
-        
-        {/* HEADER */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
-            R
-          </div>
-
-          <h1 className="text-4xl font-extrabold text-gray-800">
-            Create Account
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            Register to start managing projects
+      {/* LEFT SECTION */}
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-12 flex-col justify-between">
+        <div>
+          <h1 className="text-4xl font-bold mb-3">ProjectFlow</h1>
+          <p className="text-lg text-blue-100">
+            Smart project management for modern teams.
           </p>
         </div>
 
-        {/* FORM */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
-          {/* NAME */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Full Name
-            </label>
+        <div className="space-y-6">
+          <h2 className="text-4xl font-bold leading-tight">
+            Start managing <br />
+            projects smarter.
+          </h2>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter your name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-              required
-            />
+          <p className="text-blue-100 text-lg">
+            Create projects, assign tasks, and collaborate with your team in one workspace.
+          </p>
+
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            <div className="bg-white/10 p-5 rounded-2xl">
+              <h3 className="text-3xl font-bold">500+</h3>
+              <p className="text-blue-100">Projects Managed</p>
+            </div>
+
+            <div className="bg-white/10 p-5 rounded-2xl">
+              <h3 className="text-3xl font-bold">24/7</h3>
+              <p className="text-blue-100">Productivity</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-blue-200 text-sm">
+          Join teams building faster every day.
+        </p>
+      </div>
+
+      {/* RIGHT SECTION */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-10">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
+
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold text-slate-800">
+              Create Account
+            </h2>
+            <p className="text-slate-500 mt-2">
+              Start managing your projects today
+            </p>
           </div>
 
-          {/* EMAIL */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Email Address
-            </label>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">
+                Full Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-              required
-            />
-          </div>
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-          {/* PASSWORD */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Password
-            </label>
+            <div>
+              <label className="block text-slate-700 font-medium mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-              required
-            />
-          </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Create Account
+            </button>
+          </form>
 
-          {/* BUTTON */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold text-lg hover:scale-[1.02] hover:shadow-xl transition duration-300"
-          >
-            Create Account
-          </button>
-        </form>
-
-        {/* LOGIN LINK */}
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
+          <p className="text-center text-slate-500 mt-6">
             Already have an account?{" "}
             <Link
               to="/"
-              className="text-purple-600 font-semibold hover:underline"
+              className="text-blue-600 font-semibold hover:underline"
             >
               Login
             </Link>
@@ -135,7 +151,7 @@ function Register() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Register
+export default Register;
