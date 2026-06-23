@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-
+import socket from "../socket"
 import Navbar from "../components/Navbar"
 import Sidebar from "../components/Sidebar"
 
@@ -91,9 +91,16 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    fetchProjects()
-  }, [])
+  fetchProjects()
 
+  socket.on("connect", () => {
+    console.log("Connected:", socket.id)
+  })
+
+  return () => {
+    socket.off("connect")
+  }
+}, [])
   const handleSubmit = async (e) => {
     e.preventDefault()
 
