@@ -22,11 +22,11 @@ const createTask = async (req, res) => {
 
     // CHECK USER ACCESS
     const isOwner =
-      project.owner.toString() === req.user._id.toString()
+      project.owner.toString() === req.user.toString()
 
     const isMember = project.members.some(
       (member) =>
-        member.toString() === req.user._id.toString()
+        member.toString() === req.user.toString()
     )
 
     if (!isOwner && !isMember) {
@@ -43,12 +43,17 @@ const createTask = async (req, res) => {
       assignedTo,
     })
 
+    // Populate assignedTo before sending
+    const populatedTask = await Task.findById(task._id)
+      .populate("assignedTo", "name email")
+
     // REALTIME EVENT
     const io = req.app.get("io")
-    io.emit("taskCreated", task)
+    io.emit("taskCreated", populatedTask)
 
-    res.status(201).json(task)
+    res.status(201).json(populatedTask)
   } catch (error) {
+    console.log("CREATE TASK ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
@@ -64,6 +69,7 @@ const getTasks = async (req, res) => {
 
     res.status(200).json(tasks)
   } catch (error) {
+    console.log("GET TASKS ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
@@ -85,12 +91,16 @@ const updateTaskStatus = async (req, res) => {
     task.status = req.body.status
     await task.save()
 
+    const updatedTask = await Task.findById(task._id)
+      .populate("assignedTo", "name email")
+
     // REALTIME EVENT
     const io = req.app.get("io")
-    io.emit("taskUpdated", task)
+    io.emit("taskUpdated", updatedTask)
 
-    res.status(200).json(task)
+    res.status(200).json(updatedTask)
   } catch (error) {
+    console.log("UPDATE TASK ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
@@ -108,7 +118,6 @@ const deleteTask = async (req, res) => {
       })
     }
 
-    // REALTIME EVENT
     const io = req.app.get("io")
     io.emit("taskDeleted", {
       taskId: task._id,
@@ -120,6 +129,7 @@ const deleteTask = async (req, res) => {
       message: "Task deleted",
     })
   } catch (error) {
+    console.log("DELETE TASK ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
