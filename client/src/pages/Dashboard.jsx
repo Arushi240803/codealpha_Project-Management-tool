@@ -117,11 +117,14 @@ useEffect(() => {
     fetchProjects()
   })
 
-  socket.on("commentDeleted", (data) => {
-    console.log("Comment deleted:", data)
-    fetchProjects()
-  })
-
+  socket.on("commentDeleted", ({ commentId, taskId }) => {
+  setComments((prev) => ({
+    ...prev,
+    [taskId]: prev[taskId]?.filter(
+      (comment) => comment._id !== commentId
+    ),
+  }))
+})
   return () => {
     socket.off("connect")
     socket.off("taskCreated")
@@ -613,66 +616,68 @@ useEffect(() => {
                               >
                                 Delete Task
                               </button>
+{/* COMMENTS */}
+<div className="mt-5">
+  <h4 className="font-semibold mb-3">
+    Comments
+  </h4>
 
-                              {/* COMMENTS */}
-                              <div className="mt-5">
-                                <h4 className="font-semibold mb-3">
-                                  Comments
-                                </h4>
+  <div className="space-y-2 mb-4">
+    {comments[task._id]?.map((comment) => (
+      <div
+        key={comment._id}
+        className="bg-slate-100 rounded-xl p-3"
+      >
+        {/* Comment User */}
+        <p className="font-semibold text-sm text-blue-600 mb-1">
+          {comment.user?.name || "Unknown User"}
+        </p>
 
-                                <div className="space-y-2 mb-4">
-                                  {comments[task._id]?.map(
-                                    (comment) => (
-                                      <div
-                                        key={comment._id}
-                                        className="bg-slate-100 rounded-xl p-3"
-                                      >
-                                        <p>{comment.text}</p>
+        {/* Comment Text */}
+        <p>{comment.text}</p>
 
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteComment(
-                                              comment._id,
-                                              task._id
-                                            )
-                                          }
-                                          className="text-red-500 text-sm mt-2"
-                                        >
-                                          Delete
-                                        </button>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
+        {/* Delete Button Only For Owner */}
+        {comment.user?._id === user?._id && (
+          <button
+            onClick={() =>
+              handleDeleteComment(
+                comment._id,
+                task._id
+              )
+            }
+            className="text-red-500 text-sm mt-2"
+          >
+            Delete
+          </button>
+        )}
+      </div>
+    ))}
+  </div>
 
-                                <div className="space-y-3">
-                                  <input
-                                    type="text"
-                                    placeholder="Add comment"
-                                    value={
-                                      commentInputs[task._id] || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleCommentInputChange(
-                                        task._id,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-3 rounded-xl"
-                                  />
+  <div className="space-y-3">
+    <input
+      type="text"
+      placeholder="Add comment"
+      value={commentInputs[task._id] || ""}
+      onChange={(e) =>
+        handleCommentInputChange(
+          task._id,
+          e.target.value
+        )
+      }
+      className="w-full border p-3 rounded-xl"
+    />
 
-                                  <button
-                                    onClick={() =>
-                                      handleCreateComment(
-                                        task._id
-                                      )
-                                    }
-                                    className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl"
-                                  >
-                                    Add Comment
-                                  </button>
-                                </div>
-                              </div>
+    <button
+      onClick={() =>
+        handleCreateComment(task._id)
+      }
+      className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl"
+    >
+      Add Comment
+    </button>
+  </div>
+</div>
                             </div>
                           ))}
                       </div>
