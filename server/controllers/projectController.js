@@ -10,20 +10,19 @@ const createProject = async (req, res) => {
       title,
       description,
       owner: req.user,
-
-      // OWNER AUTOMATICALLY MEMBER
-      members: [req.user],
+      members: [req.user], // owner auto member
     })
 
     const populatedProject = await Project.findById(project._id)
       .populate("members", "name email")
       .populate("owner", "name email")
 
-    // SOCKET EMIT
+    // REALTIME EVENT
     const io = req.app.get("io")
     io.emit("projectCreated", populatedProject)
 
     res.status(201).json(populatedProject)
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -41,6 +40,7 @@ const getProjects = async (req, res) => {
       .populate("owner", "name email")
 
     res.status(200).json(projects)
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -66,13 +66,16 @@ const deleteProject = async (req, res) => {
 
     await project.deleteOne()
 
-    // SOCKET EMIT
+    // REALTIME EVENT
     const io = req.app.get("io")
-    io.emit("projectDeleted", projectId)
+    io.emit("projectDeleted", {
+      projectId,
+    })
 
     res.status(200).json({
       message: "Project deleted",
     })
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -104,7 +107,11 @@ const addMember = async (req, res) => {
     }
 
     // CHECK DUPLICATE MEMBER
-    if (project.members.includes(user._id)) {
+    const alreadyMember = project.members.some(
+      (member) => member.toString() === user._id.toString()
+    )
+
+    if (alreadyMember) {
       return res.status(400).json({
         message: "User already member",
       })
@@ -118,7 +125,7 @@ const addMember = async (req, res) => {
       .populate("members", "name email")
       .populate("owner", "name email")
 
-    // SOCKET EMIT
+    // REALTIME EVENT
     const io = req.app.get("io")
     io.emit("memberAdded", updatedProject)
 
@@ -126,6 +133,7 @@ const addMember = async (req, res) => {
       message: "Member added",
       project: updatedProject,
     })
+
   } catch (error) {
     res.status(500).json({
       message: error.message,

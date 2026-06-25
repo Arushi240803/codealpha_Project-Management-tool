@@ -43,7 +43,6 @@ const createTask = async (req, res) => {
       assignedTo,
     })
 
-    // Populate assignedTo before sending
     const populatedTask = await Task.findById(task._id)
       .populate("assignedTo", "name email")
 
@@ -52,6 +51,7 @@ const createTask = async (req, res) => {
     io.emit("taskCreated", populatedTask)
 
     res.status(201).json(populatedTask)
+
   } catch (error) {
     console.log("CREATE TASK ERROR:", error)
     res.status(500).json({
@@ -68,6 +68,7 @@ const getTasks = async (req, res) => {
     }).populate("assignedTo", "name email")
 
     res.status(200).json(tasks)
+
   } catch (error) {
     console.log("GET TASKS ERROR:", error)
     res.status(500).json({
@@ -80,7 +81,6 @@ const getTasks = async (req, res) => {
 const updateTaskStatus = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id)
-      .populate("assignedTo", "name email")
 
     if (!task) {
       return res.status(404).json({
@@ -99,6 +99,7 @@ const updateTaskStatus = async (req, res) => {
     io.emit("taskUpdated", updatedTask)
 
     res.status(200).json(updatedTask)
+
   } catch (error) {
     console.log("UPDATE TASK ERROR:", error)
     res.status(500).json({
@@ -118,16 +119,22 @@ const deleteTask = async (req, res) => {
       })
     }
 
-    const io = req.app.get("io")
-    io.emit("taskDeleted", {
-      taskId: task._id,
-    })
+    const taskId = task._id
+    const projectId = task.project
 
     await task.deleteOne()
+
+    // REALTIME EVENT
+    const io = req.app.get("io")
+    io.emit("taskDeleted", {
+      taskId,
+      projectId,
+    })
 
     res.status(200).json({
       message: "Task deleted",
     })
+
   } catch (error) {
     console.log("DELETE TASK ERROR:", error)
     res.status(500).json({

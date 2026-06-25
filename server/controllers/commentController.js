@@ -22,7 +22,7 @@ const createComment = async (req, res) => {
       user: req.user,
     })
 
-    // POPULATE USER
+    // POPULATE USER DETAILS
     const populatedComment = await Comment.findById(
       comment._id
     ).populate("user", "name email")
@@ -67,12 +67,14 @@ const deleteComment = async (req, res) => {
       })
     }
 
-    // ALLOW ONLY COMMENT OWNER TO DELETE
+    // ONLY COMMENT OWNER CAN DELETE
     if (comment.user.toString() !== req.user.toString()) {
       return res.status(401).json({
         message: "Not authorized to delete this comment",
       })
     }
+
+    const taskId = comment.task
 
     await comment.deleteOne()
 
@@ -80,7 +82,7 @@ const deleteComment = async (req, res) => {
     const io = req.app.get("io")
     io.emit("commentDeleted", {
       commentId: comment._id,
-      taskId: comment.task,
+      taskId,
     })
 
     res.status(200).json({

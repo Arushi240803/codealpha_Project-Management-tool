@@ -91,6 +91,25 @@ function Dashboard() {
     }
   }
 
+  const addNotification = (message) => {
+  const newNotification = {
+    id: Date.now(),
+    message,
+    time: new Date().toLocaleTimeString(),
+  }
+
+  setNotifications((prev) => [
+    newNotification,
+    ...prev.slice(0, 4),
+  ])
+
+  setTimeout(() => {
+    setNotifications((prev) =>
+      prev.filter((n) => n.id !== newNotification.id)
+    )
+  }, 5000)
+}
+
 useEffect(() => {
   fetchProjects()
 
@@ -98,96 +117,86 @@ useEffect(() => {
     console.log("Connected:", socket.id)
   })
 
+  // PROJECT EVENTS
+  socket.on("projectCreated", (project) => {
+    console.log("Project created:", project)
+    addNotification(`New project created: ${project.title}`)
+    fetchProjects()
+  })
+
+  socket.on("projectDeleted", (projectId) => {
+    console.log("Project deleted:", projectId)
+    addNotification("A project was deleted")
+    fetchProjects()
+  })
+
+  socket.on("memberAdded", (project) => {
+    console.log("Member added:", project)
+    addNotification(`New member added to ${project.title}`)
+    fetchProjects()
+  })
+
   // TASK EVENTS
   socket.on("taskCreated", (task) => {
     console.log("Task created:", task)
-
-    setNotifications((prev) => [
-      {
-        message: `New task created: ${task.title}`,
-      },
-      ...prev,
-    ])
-
+    addNotification(`New task created: ${task.title}`)
     fetchProjects()
   })
 
   socket.on("taskUpdated", (task) => {
     console.log("Task updated:", task)
-
-    setNotifications((prev) => [
-      {
-        message: `Task updated: ${task.title}`,
-      },
-      ...prev,
-    ])
-
+    addNotification(`Task updated: ${task.title}`)
     fetchProjects()
   })
 
-  socket.on("taskDeleted", (data) => {
-    console.log("Task deleted:", data)
-
-    setNotifications((prev) => [
-      {
-        message: "A task was deleted",
-      },
-      ...prev,
-    ])
-
+  socket.on("taskDeleted", () => {
+    console.log("Task deleted")
+    addNotification("A task was deleted")
     fetchProjects()
   })
 
   // COMMENT EVENTS
   socket.on("commentCreated", (comment) => {
-    console.log("Comment created:", comment)
+  console.log("Comment created:", comment)
 
-    setNotifications((prev) => [
-      {
-        message: `${comment.user?.name || "Someone"} added a comment`,
-      },
-      ...prev,
-    ])
+  setComments((prev) => ({
+    ...prev,
+    [comment.task]: [
+      ...(prev[comment.task] || []),
+      comment,
+    ],
+  }))
 
-    fetchProjects()
-  })
-
+  addNotification(
+    `${comment.user?.name || "Someone"} added a comment`
+  )
+})
   socket.on("commentDeleted", ({ commentId, taskId }) => {
-    console.log("Comment deleted")
+  console.log("Comment deleted")
 
-    setComments((prev) => ({
-      ...prev,
-      [taskId]: prev[taskId]?.filter(
+  setComments((prev) => ({
+    ...prev,
+    [taskId]:
+      prev[taskId]?.filter(
         (comment) => comment._id !== commentId
-      ),
-    }))
+      ) || [],
+  }))
 
-    setNotifications((prev) => [
-      {
-        message: "A comment was deleted",
-      },
-      ...prev,
-    ])
-  })
-
-  // GENERIC NOTIFICATION EVENT
-  socket.on("notification", (data) => {
-    setNotifications((prev) => [
-      data,
-      ...prev,
-    ])
-  })
-
+  addNotification("A comment was deleted")
+})
   return () => {
     socket.off("connect")
+    socket.off("projectCreated")
+    socket.off("projectDeleted")
+    socket.off("memberAdded")
     socket.off("taskCreated")
     socket.off("taskUpdated")
     socket.off("taskDeleted")
     socket.off("commentCreated")
     socket.off("commentDeleted")
-    socket.off("notification")
   }
 }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -378,23 +387,42 @@ useEffect(() => {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm p-6 border mb-8">
-  <h2 className="text-xl font-bold mb-4">
-    Notifications
-  </h2>
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-bold">
+      Notifications
+    </h2>
+
+    {notifications.length > 0 && (
+      <button
+        onClick={() => setNotifications([])}
+        className="text-sm text-red-500 hover:text-red-600"
+      >
+        Clear All
+      </button>
+    )}
+  </div>
 
   {notifications.length === 0 ? (
     <p className="text-gray-500">
       No notifications yet
     </p>
   ) : (
-    notifications.map((notification, index) => (
-      <div
-        key={index}
-        className="bg-slate-100 p-3 rounded-xl mb-2"
-      >
-        {notification.message}
-      </div>
-    ))
+    <div className="space-y-2">
+      {notifications.map((notification) => (
+        <div
+          key={notification.id}
+          className="bg-slate-100 p-3 rounded-xl"
+        >
+          <p className="font-medium text-slate-800">
+            {notification.message}
+          </p>
+
+          <p className="text-xs text-gray-500 mt-1">
+            {notification.time}
+          </p>
+        </div>
+      ))}
+    </div>
   )}
 </div>
 
@@ -696,36 +724,52 @@ useEffect(() => {
     Comments
   </h4>
 
-  <div className="space-y-2 mb-4">
-    {comments[task._id]?.map((comment) => (
-      <div
-        key={comment._id}
-        className="bg-slate-100 rounded-xl p-3"
-      >
-        {/* Comment User */}
-        <p className="font-semibold text-sm text-blue-600 mb-1">
-          {comment.user?.name || "Unknown User"}
-        </p>
+  <div className="space-y-3 mb-4">
+    {!comments[task._id] ||
+    comments[task._id].length === 0 ? (
+      <p className="text-gray-500 text-sm">
+        No comments yet
+      </p>
+    ) : (
+      comments[task._id].map((comment) => (
+        <div
+          key={comment._id}
+          className="bg-slate-100 rounded-xl p-3"
+        >
+          <div className="flex justify-between items-center mb-2">
+            <p className="font-semibold text-sm text-blue-600">
+              {comment.user?.name || "Unknown User"}
+            </p>
 
-        {/* Comment Text */}
-        <p>{comment.text}</p>
+            {comment.createdAt && (
+              <p className="text-xs text-gray-500">
+                {new Date(
+                  comment.createdAt
+                ).toLocaleString()}
+              </p>
+            )}
+          </div>
 
-        {/* Delete Button Only For Owner */}
-        {comment.user?._id === user?._id && (
-          <button
-            onClick={() =>
-              handleDeleteComment(
-                comment._id,
-                task._id
-              )
-            }
-            className="text-red-500 text-sm mt-2"
-          >
-            Delete
-          </button>
-        )}
-      </div>
-    ))}
+          <p className="text-gray-700">
+            {comment.text}
+          </p>
+
+          {comment.user?._id === user?.id && (
+            <button
+              onClick={() =>
+                handleDeleteComment(
+                  comment._id,
+                  task._id
+                )
+              }
+              className="text-red-500 text-sm mt-3 hover:text-red-700"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      ))
+    )}
   </div>
 
   <div className="space-y-3">

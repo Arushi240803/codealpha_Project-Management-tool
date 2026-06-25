@@ -18,7 +18,6 @@ const registerUser = async (req, res) => {
 
     // HASH PASSWORD
     const salt = await bcrypt.genSalt(10)
-
     const hashedPassword = await bcrypt.hash(password, salt)
 
     // CREATE USER
@@ -40,19 +39,20 @@ const registerUser = async (req, res) => {
     res.status(201).json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
       },
     })
   } catch (error) {
+    console.log("REGISTER ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
   }
 }
 
-//LOGIN FUNCTION
+// LOGIN
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -90,18 +90,19 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
       },
     })
   } catch (error) {
+    console.log("LOGIN ERROR:", error)
     res.status(500).json({
       message: error.message,
     })
   }
 }
-//exports
+
 module.exports = {
   registerUser,
   loginUser,
