@@ -39,6 +39,7 @@ function Dashboard() {
   const [tasks, setTasks] = useState({})
   const [commentInputs, setCommentInputs] = useState({})
   const [comments, setComments] = useState({})
+  const [notifications, setNotifications] = useState([])
 
   const handleChange = (e) => {
     setFormData({
@@ -97,34 +98,86 @@ useEffect(() => {
     console.log("Connected:", socket.id)
   })
 
+  // TASK EVENTS
   socket.on("taskCreated", (task) => {
     console.log("Task created:", task)
+
+    setNotifications((prev) => [
+      {
+        message: `New task created: ${task.title}`,
+      },
+      ...prev,
+    ])
+
     fetchProjects()
   })
 
   socket.on("taskUpdated", (task) => {
     console.log("Task updated:", task)
+
+    setNotifications((prev) => [
+      {
+        message: `Task updated: ${task.title}`,
+      },
+      ...prev,
+    ])
+
     fetchProjects()
   })
 
   socket.on("taskDeleted", (data) => {
     console.log("Task deleted:", data)
+
+    setNotifications((prev) => [
+      {
+        message: "A task was deleted",
+      },
+      ...prev,
+    ])
+
     fetchProjects()
   })
 
+  // COMMENT EVENTS
   socket.on("commentCreated", (comment) => {
     console.log("Comment created:", comment)
+
+    setNotifications((prev) => [
+      {
+        message: `${comment.user?.name || "Someone"} added a comment`,
+      },
+      ...prev,
+    ])
+
     fetchProjects()
   })
 
   socket.on("commentDeleted", ({ commentId, taskId }) => {
-  setComments((prev) => ({
-    ...prev,
-    [taskId]: prev[taskId]?.filter(
-      (comment) => comment._id !== commentId
-    ),
-  }))
-})
+    console.log("Comment deleted")
+
+    setComments((prev) => ({
+      ...prev,
+      [taskId]: prev[taskId]?.filter(
+        (comment) => comment._id !== commentId
+      ),
+    }))
+
+    setNotifications((prev) => [
+      {
+        message: "A comment was deleted",
+      },
+      ...prev,
+    ])
+  })
+
+  // GENERIC NOTIFICATION EVENT
+  socket.on("notification", (data) => {
+    setNotifications((prev) => [
+      data,
+      ...prev,
+    ])
+  })
+
   return () => {
     socket.off("connect")
     socket.off("taskCreated")
@@ -132,9 +185,9 @@ useEffect(() => {
     socket.off("taskDeleted")
     socket.off("commentCreated")
     socket.off("commentDeleted")
+    socket.off("notification")
   }
 }, [])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -323,6 +376,27 @@ useEffect(() => {
               Here’s what’s happening with your projects today.
             </p>
           </div>
+
+          <div className="bg-white rounded-2xl shadow-sm p-6 border mb-8">
+  <h2 className="text-xl font-bold mb-4">
+    Notifications
+  </h2>
+
+  {notifications.length === 0 ? (
+    <p className="text-gray-500">
+      No notifications yet
+    </p>
+  ) : (
+    notifications.map((notification, index) => (
+      <div
+        key={index}
+        className="bg-slate-100 p-3 rounded-xl mb-2"
+      >
+        {notification.message}
+      </div>
+    ))
+  )}
+</div>
 
           {/* STATS */}
           <div className="grid md:grid-cols-4 gap-5 mb-8">
